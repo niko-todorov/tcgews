@@ -1,5 +1,7 @@
 # Predictive Tropical Cyclogenesis  Using Machine Learning:  A Novel Approach to Early Warning Systems
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23204865.svg)](https://doi.org/10.5281/zenodo.23204865)
+
 Source code accompanying the dissertation **_Predictive Tropical Cyclogenesis Using Machine Learning: A Novel Approach to Early Warning Systems_** (Nikolay Todorov, Chapman University).
 
 This repository is a **curated release**: it contains the source code required to reproduce the results reported in the dissertation. It is not the full working tree — one-off data-repair utilities and exploratory scripts are intentionally excluded.
@@ -47,7 +49,7 @@ early-warning demonstrator (`tcg_ews.py`).
 ## Installation
 
 ```bash
-git clone <REPOSITORY_URL>
+git clone https://github.com/niko-todorov/tcgews
 cd <repo>
 python -m venv .venv && source .venv/bin/activate   # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
@@ -109,8 +111,8 @@ python tcg_ews.py --basin <NACSGM|WPMM> --source era5 --time <time> \
     --truth <lat,lon> --taper --ocean-fill --halo 6 --argmax component
 ```
 
-| Fig | Storm (year)   | Basin  | `--time` | `--truth` (lat, lon °E) |
-|-----|----------------|--------|----------|---------------------|
+| Fig | Storm (year) | Basin | `--time` | `--truth` (lat, lon °E)|
+|-----|--------------|-------|----------|------------------------|
 | 7.1 | Klaus (1984)   | NACSGM | 1984-11-05T18:00 | 14.7, 291.2 |
 | 7.2 | Fabian (1991)  | NACSGM | 1991-10-15T00:00 | 18.9, 274.3 |
 | 7.3 | Erika (2009)   | NACSGM | 2009-09-02T18:00 | 16.3, 299.0 |
@@ -127,7 +129,7 @@ python tcg_ews.py --basin <NACSGM|WPMM> --source era5 --time <time> \
 
 ## Model weights
 
-Trained LOYO checkpoints are archived with the release at **Zenodo: `<ZENODO_DOI>`**. Download and
+Trained LOYO checkpoints are archived with the release at **Zenodo: `10.5281/zenodo.23204865`**. Download and
 place them where `tcg_ews.py` expects them (see the script's `--help`).
 
 ---
@@ -143,7 +145,7 @@ place them where `tcg_ews.py` expects them (see the script's `--help`).
   year   = {2026}
 }
 ```
-Software archive: **Zenodo DOI `<ZENODO_DOI>`**.
+Software archive: **Zenodo DOI `10.5281/zenodo.23204865`**.
 
 ---
 
