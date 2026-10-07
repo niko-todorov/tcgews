@@ -140,7 +140,7 @@ def make_map(ds, basin, lead, theta, watches, truth=None, vmin=None, vmax=None):
                    edgecolors=(0.486, 0.988, 0.0, 0.9), linewidths=2.5, zorder=5, **tf)
         # ax.text(t_lon, t_lat, "  obs", color="#00268f", fontsize=9,
         #         va="center", ha="left", zorder=6, **tf)
-    cb = fig.colorbar(mesh, ax=ax, fraction=0.03, pad=0.02, shrink=0.95)
+    cb = fig.colorbar(mesh, ax=ax, fraction=0.03, pad=0.02, shrink=0.8)
     cb.set_label(f"P(genesis within {lead} h)")
     ax.set_title(f"{basin.name} — analysis {ds.attrs.get('analysis_time','?')} — +{lead} h")
     fig.tight_layout()
