@@ -1,0 +1,24 @@
+{
+  "title": "tcgews: Predictive Tropical Cyclogenesis Using Machine Learning",
+  "description": "Source code accompanying the dissertation \"Predictive Tropical Cyclogenesis Using Machine Learning: A Novel Approach to Early Warning Systems\" (Nikolay Todorov, Chapman University). A spatio-temporal ConvLSTM that predicts calibrated genesis-location probability fields for tropical cyclogenesis across 0-48 h lead times in two ocean basins (North Atlantic/Caribbean/Gulf and Western Pacific), trained under leave-one-year-out cross-validation and delivered through an operational early-warning demonstrator.",
+  "upload_type": "software",
+  "access_right": "open",
+  "license": "MIT",
+  "creators": [
+    {
+      "name": "Todorov, Nikolay",
+      "affiliation": "Chapman University",
+      "orcid": "0000-0002-9108-8081"
+    }
+  ],
+  "keywords": [
+    "tropical cyclogenesis",
+    "tropical cyclones",
+    "machine learning",
+    "deep learning",
+    "ConvLSTM",
+    "early warning system",
+    "genesis prediction",
+    "ERA5"
+  ]
+}

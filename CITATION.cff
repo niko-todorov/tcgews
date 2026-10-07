@@ -1,0 +1,27 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite the dissertation and this archived release."
+title: "Predictive Tropical Cyclogenesis Using Machine Learning: A Novel Approach to Early Warning Systems"
+abstract: >-
+  Source code for a spatio-temporal ConvLSTM that predicts calibrated
+  genesis-location probability fields for tropical cyclogenesis across
+  0-48 h lead times in two ocean basins (North Atlantic/Caribbean/Gulf and
+  Western Pacific), delivered through an operational early-warning demonstrator.
+type: software
+authors:
+  - family-names: Todorov
+    given-names: Nikolay
+    affiliation: "Chapman University"
+    orcid: "https://orcid.org/0000-0002-9108-8081"
+repository-code: "https://github.com/niko-todorov/tcgews"
+url: "https://github.com/niko-todorov/tcgews"
+license: MIT
+version: "v1.0.0"
+date-released: "2026-10-06"
+keywords:
+  - tropical cyclogenesis
+  - machine learning
+  - deep learning
+  - ConvLSTM
+  - early warning system
+  - ERA5
+# doi: 10.5281/zenodo.XXXXXXX   # <-- add the Zenodo concept DOI once minted
