@@ -1,0 +1,26 @@
+# ---------------------------------------------------------------------------
+# Streamlit Community Cloud dependencies for the EWS dashboard.
+# PLACE THIS FILE AT:  src/py/ews/requirements.txt
+#
+# Streamlit Cloud installs the dependency file found in the ENTRYPOINT's
+# directory first (and only that one), ahead of the repository-root
+# requirements.txt.  So this keeps the deployed dashboard light: it does NOT
+# pull in torch / cfgrib / eccodes / cdsapi / ecmwf-opendata / tcpyPI, none of
+# which the visualization needs.  The root requirements.txt still serves the
+# full pipeline and the Colab demo.
+# ---------------------------------------------------------------------------
+
+streamlit>=1.61,<2      # pin the major, per Streamlit's deployment guidance
+numpy>=1.24
+pandas>=2.0
+scipy>=1.10             # ews_core watch detection (connected components)
+xarray>=2023.1
+netCDF4>=1.6            # read the .nc EWS output files
+matplotlib>=3.7
+
+# Optional — coastlines/basemaps.  Cartopy needs system libraries on
+# Streamlit Cloud (Debian); if you enable it, also add a root-level
+# packages.txt containing:  libgeos-dev  libproj-dev  proj-bin  proj-data
+# The dashboard already falls back to a plain (coastline-free) map when
+# cartopy is unavailable, so you can deploy without it first.
+cartopy>=0.22
