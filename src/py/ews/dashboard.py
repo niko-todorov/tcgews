@@ -137,7 +137,7 @@ def make_map(ds, basin, lead, theta, watches, truth=None, vmin=None, vmax=None):
         t_lat, t_lon = truth
         t_lon = float(_wrap180(t_lon))
         ax.scatter([t_lon], [t_lat], s=500, facecolors="none",
-                   edgecolors=(0.0, 0.149, 0.561, 0.5), linewidths=2.0, zorder=5, **tf)
+                   edgecolors=(0.486, 0.988, 0.0, 0.9), linewidths=2.5, zorder=5, **tf)
         # ax.text(t_lon, t_lat, "  obs", color="#00268f", fontsize=9,
         #         va="center", ha="left", zorder=6, **tf)
     cb = fig.colorbar(mesh, ax=ax, fraction=0.03, pad=0.02)
