@@ -48,7 +48,7 @@ try:
 except Exception:
     HAS_CARTOPY = False
 
-CMAP = "viridis_r"   # yellow = 0.0 (low), purple = 1.0 (high)
+CMAP = "viridis"     # dark blue/purple = 0.0 (low), yellow = 1.0 (high)
 
 
 def _wrap180(x):
@@ -141,7 +141,7 @@ def make_map(ds, basin, lead, theta, watches, truth=None, vmin=None, vmax=None):
         # ax.text(t_lon, t_lat, "  obs", color="#00268f", fontsize=9,
         #         va="center", ha="left", zorder=6, **tf)
     cb = fig.colorbar(mesh, ax=ax, fraction=0.03, pad=0.02)
-    cb.set_label("P(genesis within 6 h)")
+    cb.set_label(f"P(genesis within {lead} h)")
     ax.set_title(f"{basin.name} — analysis {ds.attrs.get('analysis_time','?')} — +{lead} h")
     fig.tight_layout()
     return fig
@@ -161,8 +161,8 @@ def make_sparkline(ds, theta):
 
 
 def main():
-    st.set_page_config(page_title="TCG early warning system", layout="wide")
-    st.title("TCG early warning system")
+    st.set_page_config(page_title="tcgews", layout="wide")
+    st.title("tcgews: Tropical Cyclogenesis Early Warning System")
 
     with st.sidebar:
         st.header("Controls")
@@ -253,6 +253,7 @@ def main():
     left, right = st.columns([3, 1])
     with left:
         st.pyplot(make_map(ds, basin, lead, theta, watches, truth=truth, vmin=vmin, vmax=vmax))
+        st.caption("© 2026 Nikolay Todorov")
     with right:
         st.caption("Peak probability vs lead time")
         st.pyplot(make_sparkline(ds, theta))
