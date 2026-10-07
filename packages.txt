@@ -1,9 +1,3 @@
-# Streamlit Community Cloud system (apt-get / Debian) packages.
-# PLACE THIS FILE AT THE REPOSITORY ROOT  (Community Cloud only detects
-# packages.txt at the repo root, unlike requirements.txt).
-#
-# Needed because the dashboard's src/py/ews/requirements.txt enables cartopy
-# (coastlines / basemaps), whose C extensions link against GEOS and PROJ.
 libgeos-dev
 libproj-dev
 proj-bin
