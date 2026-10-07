@@ -173,9 +173,50 @@ cython_debug/
 # PyPI configuration file
 .pypirc
 
-# Cursor  
-#  Cursor is an AI-powered code editor.`.cursorignore` specifies files/directories to 
-#  exclude from AI features like autocomplete and code analysis. Recommended for sensitive data
-#  refer to https://docs.cursor.com/context/ignore-files
-.cursorignore
-.cursorindexingignore
+
+# ============================================================
+# ---- Project-specific (not covered by the standard template) ----
+# ============================================================
+
+# Data & large binaries (licensing + size — keep out of git history)
+*.nc
+*.nc4
+*.grib
+*.grib2
+*.grb
+*.idx
+*.zarr/
+*.h5
+*.hdf5
+
+# Model checkpoints & serialized state (attach to the Zenodo release instead)
+*.pt
+*.pth
+*.ckpt
+#*.pkl
+#*.pickle
+*.joblib
+*.npy
+*.npz
+
+# Bulk tabular data  (force-add small config/seed CSVs:  git add -f file.csv)
+*.csv
+*.tsv
+
+# Local data / cache / output directories
+# data/
+cache/
+.cache/
+outputs/
+output/
+runs/
+logs/
+era5_cache/
+checkpoints/
+
+# Credentials & secrets (NEVER commit)  — .env and .pypirc are covered above
+.cdsapirc
+*.key
+*.pem
+*.token
+secrets*
