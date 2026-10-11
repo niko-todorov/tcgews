@@ -214,6 +214,106 @@ def detect_watches(ds: xr.Dataset, lead_hours: int, theta: float, min_area_km2: 
     return watches
 
 
+# --------------------------------------------------------------------------- #
+#  Auto threshold — pick theta so exactly ONE alarm area fires
+# --------------------------------------------------------------------------- #
+def _count_qualifying(prob: np.ndarray, ocean: np.ndarray, cell_area: np.ndarray,
+                      theta: float, min_area_km2: float) -> int:
+    """Number of connected ocean components with prob >= theta and area >= floor.
+
+    Identical qualification rule to detect_watches(), but counts only (no Watch
+    objects) so a threshold sweep stays cheap.
+    """
+    mask = (prob >= theta) & ocean
+    if not mask.any():
+        return 0
+    labels, n = ndimage.label(mask)
+    count = 0
+    for lab in range(1, n + 1):
+        if float(cell_area[labels == lab].sum()) >= min_area_km2:
+            count += 1
+    return count
+
+
+def auto_threshold_one_watch(
+    ds: xr.Dataset,
+    lead_hours: int,
+    min_area_km2: float,
+    n_levels: int = 200,
+) -> float:
+    """Return the per-run alert threshold theta that yields exactly ONE alarm area.
+
+    The number of active watches is the number of connected ocean components whose
+    probability clears theta and whose area clears ``min_area_km2``. As theta is
+    lowered from the field maximum, that count rises 0 -> 1 (the single strongest
+    disturbance first clears the area floor) -> 2+ (a second, weaker disturbance
+    appears) -> ... This routine scans theta downward from the peak, isolates the
+    first contiguous band where the count is exactly one, and returns the midpoint
+    of that band. The midpoint keeps the default comfortably inside the one-alarm
+    range, away from the edges where it would flip to zero or to two.
+
+    Parameters
+    ----------
+    ds           : run dataset (prob, lat, lon, optional land_mask).
+    lead_hours   : lead at which the alarm count is evaluated.
+    min_area_km2 : minimum flagged-region area to count as an alarm (matches the
+                   dashboard's "Min disturbance area" control and detect_watches).
+    n_levels     : number of threshold samples in the downward sweep.
+
+    Returns
+    -------
+    theta : float. The one-alarm midpoint when such a band exists; otherwise the
+            threshold whose alarm count is closest to one (ties broken toward the
+            higher threshold, i.e. fewer alarms). Returns 0.0 for an all-zero field.
+
+    Notes
+    -----
+    The area floor is authoritative: if the strongest region never reaches
+    ``min_area_km2`` at any threshold, a single alarm is not attainable and the
+    fallback threshold is returned (the operator can lower the area floor).
+    """
+    prob = ds["prob"].sel(lead=lead_hours).values.astype("float32")
+    lat, lon = ds["lat"].values, ds["lon"].values
+    ocean = (ds["land_mask"].values == 0) if "land_mask" in ds else np.ones_like(prob, bool)
+
+    vals = prob[ocean]
+    if vals.size == 0:
+        return 0.0
+    pmax = float(vals.max())
+    if pmax <= 0.0:
+        return 0.0
+
+    cell_area = _cell_area_km2(lat, lon)
+
+    # Candidate thresholds, high -> low: from just under the peak to a low floor.
+    lo = max(float(vals.min()), pmax * 1e-3)
+    levels = np.linspace(pmax * (1.0 - 1e-6), lo, int(n_levels))
+
+    # First contiguous band (scanning downward) where the count is exactly one.
+    band: List[float] = []
+    started = False
+    for th in levels:
+        c = _count_qualifying(prob, ocean, cell_area, float(th), min_area_km2)
+        if c == 1:
+            band.append(float(th))
+            started = True
+        elif started and c >= 2:
+            break          # the one-alarm band ended; a second region just appeared
+    if band:
+        return float(0.5 * (band[0] + band[-1]))   # midpoint of the one-alarm band
+
+    # Fallback: no exact one-alarm band (e.g. area floor too large, or two regions
+    # clear the floor at the same level). Pick the theta whose count is closest to
+    # one, preferring the higher threshold (fewer alarms) on ties.
+    best_th, best_key = float(pmax * 0.5), (10 ** 9, 0.0)
+    for th in levels:
+        c = _count_qualifying(prob, ocean, cell_area, float(th), min_area_km2)
+        key = (abs(c - 1), -float(th))
+        if key < best_key:
+            best_key, best_th = key, float(th)
+    return best_th
+
+
 def peak_curve(ds: xr.Dataset) -> Tuple[List[int], List[float]]:
     """Max probability at each lead — the degradation curve for the sparkline."""
     ocean = (ds["land_mask"].values == 0) if "land_mask" in ds else None

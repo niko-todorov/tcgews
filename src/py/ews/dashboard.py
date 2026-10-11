@@ -68,18 +68,14 @@ def _run_label(path):
     """Human label from {key}_{source}_{YYYYMMDD}T{HH}Z[_variant...].nc.
     Handles post-processing variants (…Z_taper, …Z_taper_fill_halo6_component)."""
     parts = path.stem.split("_")
-    ti = next((i for i, tok in enumerate(parts)
-               if re.match(r"^\d{8}T\d{2}Z$", tok)), None)
-    if ti is None:
-        return path.stem
-    source = "_".join(parts[1:ti]) if ti > 1 else "—"
-    variant = " · ".join(parts[ti + 1:]) if len(parts) > ti + 1 else "raw"
+    time_tok = parts[-1]
+    source = "_".join(parts[1:-1]) if len(parts) > 2 else "—"
     try:
-        d = dt.datetime.strptime(parts[ti].replace("Z", ""), "%Y%m%dT%H")
+        d = dt.datetime.strptime(time_tok.replace("Z", ""), "%Y%m%dT%H")
         tstr = d.strftime("%Y-%m-%d %H:00Z")
     except ValueError:
-        tstr = parts[ti]
-    return f"{tstr} · {source} · {variant}"
+        tstr = time_tok
+    return f"{tstr} · {source}"
 
 
 def load_run(path):
@@ -182,42 +178,37 @@ def main():
             help="Draw a circle at an observed genesis point; overrides any stored "
                  "truth in the file. e.g. 15.0,-78.0")
         lead = st.select_slider("Lead time (h)", options=LEAD_HOURS, value=0)
-
-        # Load the chosen run now so the threshold and colour-scale sliders can
-        # track the actual (sub-0.001) probability range instead of a fixed 0–1.
-        if _chosen is not None:
-            ds, synthetic = load_run(_chosen), False
-        else:
-            ds, synthetic = core.load_latest(basin)
-        _pf = ds["prob"].sel(lead=lead).values
-        fmin = float(np.nanmin(_pf)); fmax = float(np.nanmax(_pf))
-        if not np.isfinite(fmax) or fmax <= fmin:
-            fmax = fmin + 1e-6
-        _step = max((fmax - fmin) / 200.0, 1e-7)
-
-        # Threshold bounds span the whole run (max over all leads) so they do not
-        # change with the lead time; Streamlit then preserves the chosen θ across
-        # lead changes, exactly like the min-area slider.
-        pmax_all = float(np.nanmax(ds["prob"].values))
-        if not np.isfinite(pmax_all) or pmax_all <= 0.0:
-            pmax_all = fmax
-        _tstep = max(pmax_all / 200.0, 1e-7)
-        theta = st.slider("Alert threshold θ", 0.0, pmax_all,
-                          float(np.clip(basin.theta, 0.0, pmax_all)), _tstep, format="%.5f",
-                          help=f"Run-wide probability max: {pmax_all:.5f} "
-                               f"(per-basin default θ={basin.theta:.4f}); held "
-                               f"constant across lead times.")
-        vmin, vmax = st.slider("Colour scale (probability range)", fmin, fmax,
-                               (fmin, fmax), _step, format="%.5f",
-                               help="Both handles span the current field’s min–max.")
         min_area = st.slider("Min disturbance area (10³ km²)", 0, 200,
                              int(basin.min_area_km2 / 1000), 5) * 1000
+        auto_theta = st.checkbox(
+            "Auto θ — exactly one alarm", value=True,
+            help="Set the alert threshold per run so exactly one connected alarm "
+                 "area fires at the selected lead — never zero, never two or more. "
+                 "The threshold isolates the single strongest disturbance. Uncheck "
+                 "to set θ manually.")
 
+    if _chosen is not None:
+        ds, synthetic = load_run(_chosen), False
+    else:
+        ds, synthetic = core.load_latest(basin)
     if synthetic:
         st.info(f"No output file found under data\\{basin.folder}\\ews for {basin_key} — "
                 "showing synthetic demonstration data.")
     else:
         st.caption(format_provenance_caption(ds, synthetic=synthetic))
+
+    # Alert threshold θ — auto (one alarm) by default, or manual via the slider.
+    # The auto value is derived per run and per lead from the probability field,
+    # so it tracks whichever run / lead / min-area is selected above.
+    if auto_theta:
+        theta = core.auto_threshold_one_watch(ds, lead, min_area)
+        st.sidebar.caption(
+            f"Auto θ = {theta:.4f} → one alarm at +{lead} h "
+            f"(min area {min_area/1000:.0f}k km²)")
+    else:
+        theta = st.sidebar.slider(
+            "Alert threshold θ", 0.0, 1.0, float(basin.theta), 0.001,
+            help=f"Per-basin default for {basin_key}: {basin.theta:.3f}")
 
     # Ground-truth marker: from file attrs unless overridden in the sidebar.
     truth = None
@@ -252,8 +243,7 @@ def main():
 
     left, right = st.columns([3, 1])
     with left:
-        st.pyplot(make_map(ds, basin, lead, theta, watches, truth=truth, vmin=vmin, vmax=vmax))
-        st.caption("© 2026 Nikolay Todorov")
+        st.pyplot(make_map(ds, basin, lead, theta, watches, truth=truth))
     with right:
         st.caption("Peak probability vs lead time")
         st.pyplot(make_sparkline(ds, theta))
