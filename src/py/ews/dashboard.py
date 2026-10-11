@@ -34,7 +34,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import streamlit as st
 
-from basins import BASINS, LEAD_HOURS
+from basins import BASINS, LEAD_HOURS, radius_km_from_area_km2
 from ews import ews_core as core
 from provenance import format_provenance_caption
 import xarray as xr
@@ -180,6 +180,14 @@ def main():
         lead = st.select_slider("Lead time (h)", options=LEAD_HOURS, value=0)
         min_area = st.slider("Min disturbance area (10³ km²)", 0, 200,
                              int(basin.min_area_km2 / 1000), 5) * 1000
+        # Read the area floor back as a physical disturbance radius, and show the
+        # per-basin default (itself defined from a radius in basins.py). The floor
+        # is a fixed per-basin operational scale — the per-run "one alarm" tuning
+        # is done by θ, not by moving this floor.
+        st.caption(
+            f"≈ disc of radius {radius_km_from_area_km2(min_area):.0f} km · "
+            f"{basin_key} default {basin.min_area_km2/1000:.0f}k km² "
+            f"(r ≈ {basin.min_disturbance_radius_km:.0f} km)")
         auto_theta = st.checkbox(
             "Auto θ — exactly one alarm", value=True,
             help="Set the alert threshold per run so exactly one connected alarm "
