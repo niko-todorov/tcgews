@@ -181,20 +181,18 @@ def main():
         lead = st.select_slider("Lead time (h)", options=LEAD_HOURS, value=0)
         min_area = st.slider("Min disturbance area (10³ km²)", 0, 200,
                              int(basin.min_area_km2 / 1000), 5) * 1000
-        # Read the area floor back as a physical disturbance radius, and show the
-        # per-basin default. Computed INLINE (disc area = pi*r^2) with no
-        # cross-file dependency, so this file deploys stand-alone: it never needs
-        # a matching ews_core.py or basins.py version. The per-basin radius is
-        # read with getattr (present only on the newer basins.py). The floor is a
+        # Show the CURRENT slider value as both area and its disc-radius
+        # equivalent (disc area = pi*r^2). Computed INLINE with no cross-file
+        # dependency, so this file deploys stand-alone. The per-basin default is
+        # appended only when the slider has been moved off it (at the default the
+        # two would be identical, which just reads as clutter). The floor is a
         # fixed per-basin operational scale; the per-run "one alarm" tuning is
         # done by θ, not by moving this floor.
         _r_of = lambda a: math.sqrt(max(float(a), 0.0) / math.pi)
-        _r_live = _r_of(min_area)
-        _r_default = getattr(basin, "min_disturbance_radius_km", 0.0) or _r_of(basin.min_area_km2)
-        st.caption(
-            f"≈ disc of radius {_r_live:.0f} km · "
-            f"{basin_key} default {basin.min_area_km2/1000:.0f}k km² "
-            f"(r ≈ {_r_default:.0f} km)")
+        _cap = f"min area {min_area/1000:.0f}k km²  ≈ disc of radius {_r_of(min_area):.0f} km"
+        if abs(float(min_area) - float(basin.min_area_km2)) > 1.0:
+            _cap += f"  ·  {basin_key} default {basin.min_area_km2/1000:.0f}k km²"
+        st.caption(_cap)
         auto_theta = st.checkbox(
             "Auto θ — exactly one alarm", value=True,
             help="Set the alert threshold per run so exactly one connected alarm "
