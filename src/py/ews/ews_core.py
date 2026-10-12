@@ -17,6 +17,7 @@ Dissertation: "Predictive Tropical Cyclogenesis Using Machine Learning:
 from __future__ import annotations
 
 import datetime as dt
+import math
 from dataclasses import dataclass
 from pathlib import Path
 from typing import List, Optional, Tuple
@@ -25,9 +26,37 @@ import numpy as np
 import xarray as xr
 from scipy import ndimage
 
-from basins import BASINS, BasinConfig, LEAD_HOURS, EARTH_KM_PER_DEG
+from basins import BASINS, BasinConfig, LEAD_HOURS
 from paths import ews_output_dir
 from provenance import stamp_provenance
+
+# EARTH_KM_PER_DEG is a stable physical constant. Import it defensively so an
+# older or trimmed basins.py that lacks it can never block the EWS at load time
+# (the failure mode that a missing optional symbol caused in the dashboard).
+try:
+    from basins import EARTH_KM_PER_DEG
+except ImportError:
+    EARTH_KM_PER_DEG = 111.32  # mean km per degree of latitude (fallback)
+
+
+# --------------------------------------------------------------------------- #
+#  Geometry helpers — canonical home for the min-area <-> radius conversion
+# --------------------------------------------------------------------------- #
+# These live here (in the EWS module that is always co-deployed with
+# dashboard.py) rather than only in basins.py, so consumers can read the
+# min-disturbance-area floor back as a physical radius without depending on a
+# particular basins.py version. basins.py may define its own copies for the
+# config-time derivation; that is harmless.
+def disc_area_km2(radius_km: float) -> float:
+    """Area (km²) of a disc of the given radius — the physical footprint a
+    minimum-size disturbance occupies. pi * r**2."""
+    return math.pi * float(radius_km) * float(radius_km)
+
+
+def radius_km_from_area_km2(area_km2: float) -> float:
+    """Disc radius (km) for a given area — reads a min-area floor back as a
+    physical radius. Inverse of disc_area_km2."""
+    return math.sqrt(max(float(area_km2), 0.0) / math.pi)
 
 
 # --------------------------------------------------------------------------- #

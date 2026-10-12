@@ -20,7 +20,6 @@ from __future__ import annotations
 
 import sys
 import re
-import math
 from pathlib import Path
 
 # --- path bootstrap: parents[1] of this file is src/py -----------------------
@@ -182,13 +181,14 @@ def main():
         min_area = st.slider("Min disturbance area (10³ km²)", 0, 200,
                              int(basin.min_area_km2 / 1000), 5) * 1000
         # Read the area floor back as a physical disturbance radius, and show the
-        # per-basin default. Computed locally (area of a disc = pi*r^2) so this
-        # works whether or not basins.py exposes the radius helper/field — the
-        # floor is a fixed per-basin operational scale, while the per-run
-        # "one alarm" tuning is done by θ, not by moving this floor.
-        _r_live = math.sqrt(max(float(min_area), 0.0) / math.pi)
+        # per-basin default. The radius helper lives in ews_core (co-deployed
+        # with this file), and the per-basin radius is read with getattr, so the
+        # caption works whether or not basins.py exposes it — the floor is a
+        # fixed per-basin operational scale, while the per-run "one alarm" tuning
+        # is done by θ, not by moving this floor.
+        _r_live = core.radius_km_from_area_km2(min_area)
         _r_default = getattr(basin, "min_disturbance_radius_km", 0.0) or \
-            math.sqrt(max(float(basin.min_area_km2), 0.0) / math.pi)
+            core.radius_km_from_area_km2(basin.min_area_km2)
         st.caption(
             f"≈ disc of radius {_r_live:.0f} km · "
             f"{basin_key} default {basin.min_area_km2/1000:.0f}k km² "
