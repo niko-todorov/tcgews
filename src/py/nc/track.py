@@ -51,6 +51,17 @@ _north: float = 32.0   # combined MBR north (degrees)
 _west: float  = 263.0  # combined MBR west  (degrees, 0–360)
 _east: float  = 305.0  # combined MBR east  (degrees, 0–360)
 
+# TRACK_TYPE policy -------------------------------------------------------
+# IBTrACS reanalyzes tracks to TRACK_TYPE='main' only AFTER the season; the
+# current/recent season is still 'PROVISIONAL'/'US-PROVISIONAL' and may be
+# revised. Training and the historical evaluation use 'main' ONLY, for
+# reproducibility (provisional labels can change on re-download). Operational
+# validation of live EWS forecasts needs the current season, so it is written
+# to a SEPARATE provisional origins file, tagged by TRACK_TYPE, never mixed
+# into the training positives/negatives.
+ADMIT_PROVISIONAL: bool = True   # True only for operational near-real-time scoring (Chapter 6 EWS)
+_PROVISIONAL_TRACK_TYPES: set = {'PROVISIONAL', 'US-PROVISIONAL'}  # IBTrACS current-season track types
+
 # Combined NACS + NAGM buffered MBR
 # Raw union:  south=10, north=31, west=262, east=301
 # 1° inset on sensitive edges to avoid boundary storm artefacts:
@@ -432,16 +443,19 @@ def main():
     # Filtering here, before saving the basin CSV, ensures every downstream
     # file (basin, origins, negatives-origins) is clean.
     # ----------------------------------------------------------------------
-    ALLOWED_TRACK_TYPE = 'main'
+    df_basin = df.copy()   # snapshot before 'main' gate (for provisional recovery)
+    # Training / historical gate: canonical reanalyzed track ONLY. A set so
+    # .isin() works; provisional rows are recovered separately below, never mixed.
+    ALLOWED_TRACK_TYPE = {'main'}
     n_before_track = len(df)
-    excluded_tt = df[df['TRACK_TYPE'] != ALLOWED_TRACK_TYPE]
+    excluded_tt = df[~df['TRACK_TYPE'].isin(ALLOWED_TRACK_TYPE)]
     tt_breakdown = {}
     if len(excluded_tt) > 0:
         tt_breakdown = excluded_tt['TRACK_TYPE'].value_counts().to_dict()
-        print(f'  TRACK_TYPE filter: dropped {len(excluded_tt)} non-main rows '
-              f'({tt_breakdown})')
-    df = df[df['TRACK_TYPE'] == ALLOWED_TRACK_TYPE]
-    print(f'3b [TRACK_TYPE=main] df: {len(df)} (was {n_before_track})')
+        print(f'  TRACK_TYPE filter: dropped {len(excluded_tt)} rows not in '
+              f'{sorted(ALLOWED_TRACK_TYPE)} ({tt_breakdown})')
+    df = df[df['TRACK_TYPE'].isin(ALLOWED_TRACK_TYPE)]
+    print(f'3b [TRACK_TYPE={ALLOWED_TRACK_TYPE}] df: {len(df)} (was {n_before_track})')
     cascade_log.append({
         'label': "TRACK_TYPE = 'main'",
         'count': len(df), 'level': 0,
@@ -523,6 +537,41 @@ def main():
     _csv_neg = f'{PATH}{_from_year}-{_basin}-{_subbasin}-negatives-origins-{ibtracks}'
     df_neg.to_csv(_csv_neg, index=False)
     print(f'\t...saved NEGATIVES to {_csv_neg}')
+
+    # ----------------------------------------------------------------------
+    # Provisional origins (operational EWS validation only).
+    # Re-derive genesis points from the pre-TRACK_TYPE basin frame so the
+    # current season — dropped by the 'main' gate above — is recovered. These
+    # rows are kept SEPARATE and carry TRACK_TYPE so they can never be
+    # confused with reanalyzed training labels.
+    # ----------------------------------------------------------------------
+    if ADMIT_PROVISIONAL:
+        prov = df_basin[df_basin['TRACK_TYPE'].isin(_PROVISIONAL_TRACK_TYPES)].copy()
+        prov['ISO_TIME'] = pd.to_datetime(prov['ISO_TIME'], errors='coerce')
+        # Diagnostic: what provisional data is actually present before genesis selection.
+        print(f'  [provisional] rows={len(prov)}, storms={prov["SID"].nunique()}, '
+              f'TRACK_TYPE={prov["TRACK_TYPE"].value_counts().to_dict()}, '
+              f'NATURE(all rows)={prov["NATURE"].value_counts().to_dict()}')
+        # Genesis = FIRST developing fix. Reanalyzed 'main' tracks begin at genesis,
+        # so the main pipeline can take the earliest row then filter NATURE. Real-time
+        # provisional tracks often begin at the invest/disturbance (DS) stage, so we
+        # must filter to developing natures BEFORE taking the earliest row — otherwise
+        # the genesis row is DS and the storm is dropped.
+        prov = prov[prov['NATURE'].isin(POS_NATURES)]
+        prov = prov.sort_values(by='ISO_TIME').drop_duplicates(subset='SID', keep='first')
+        _csv_prov = (f'{PATH}{_from_year}-{_basin}-{_subbasin}-'
+                     f'provisional-origins-{ibtracks}')
+        prov.to_csv(_csv_prov, index=False)
+        _seasons = sorted(prov['SEASON'].dropna().astype(int).unique().tolist())
+        print(f'  Provisional (NATURE in {sorted(POS_NATURES)}, '
+              f'TRACK_TYPE in {sorted(_PROVISIONAL_TRACK_TYPES)}): '
+              f'{len(prov)} storms, seasons={_seasons}')
+        print(f'\t...saved PROVISIONAL to {_csv_prov}')
+        cascade_log.append({
+            'label': f'PROVISIONAL (current season, TRACK_TYPE in '
+                     f'{sorted(_PROVISIONAL_TRACK_TYPES)})',
+            'count': len(prov), 'level': 1, 'branch': 'excluded',
+        })
 
     # For backward compatibility with code that still inspects `df`:
     df = df_pos
