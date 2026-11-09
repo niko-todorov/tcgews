@@ -1,10 +1,10 @@
-# Predictive Tropical Cyclogenesis  Using Machine Learning:  A Novel Approach to Early Warning Systems
+# Predictive Tropical Cyclogenesis  Using Deep Learning:  A Novel Approach to Early Warning Systems
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23204865.svg)](https://doi.org/10.5281/zenodo.23204865)
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/niko-todorov/tcgews/blob/main/colab_demo.ipynb)
 [![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://tcgews.streamlit.app/)
 
-Source code accompanying the dissertation **_Predictive Tropical Cyclogenesis Using Machine Learning: A Novel Approach to Early Warning Systems_** (Nikolay Todorov, Chapman University).
+Source code accompanying the dissertation **_Predictive Tropical Cyclogenesis Using Deep Learning: A Novel Approach to Early Warning Systems_** (Nikolay Todorov, Chapman University).
 
 This repository is a **curated release**: it contains the source code required to reproduce the results reported in the dissertation. It is not the full working tree — one-off data-repair utilities and exploratory scripts are intentionally excluded.
 
@@ -141,7 +141,7 @@ place them where `tcg_ews.py` expects them (see the script's `--help`).
 ```bibtex
 @phdthesis{Todorov_TCG,
   author = {Todorov, Nikolay},
-  title  = {Predictive Tropical Cyclogenesis Using Machine Learning:
+  title  = {Predictive Tropical Cyclogenesis Using Deep Learning:
             A Novel Approach to Early Warning Systems},
   school = {Chapman University},
   year   = {2026}

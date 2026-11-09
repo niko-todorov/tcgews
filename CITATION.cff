@@ -1,6 +1,6 @@
 cff-version: 1.2.0
 message: "If you use this software, please cite the dissertation and this archived release."
-title: "Predictive Tropical Cyclogenesis Using Machine Learning: A Novel Approach to Early Warning Systems"
+title: "Predictive Tropical Cyclogenesis Using Deep Learning: A Novel Approach to Early Warning Systems"
 abstract: >-
   Source code for a spatio-temporal ConvLSTM that predicts calibrated
   genesis-location probability fields for tropical cyclogenesis across
