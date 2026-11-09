@@ -922,9 +922,11 @@ def run_inference(
     heatmaps. The model emits raw logits; the probability map is a spatial softmax
     over OCEAN cells only — matching the training loss (log_softmax over ocean).
 
-    For lead time τ hours, the model receives the T consecutive snapshots whose
-    last element is t0 − τ. The oldest T=9 frames are padded at the front for
-    short windows.
+    For lead time τ hours the model receives the NEWEST 9 − τ/6 snapshots, whose
+    last element is t0 (oldest real frame = t0 − (48 − τ)), zero-padded at the
+    front to T=9 — matching training (TCGMultiLeadDataset + tcg_collate_fn). The
+    predicted genesis field is therefore valid at t0 + τ (a genuine τ-hour
+    forecast), not at the analysis time.
 
     Returns
     -------
@@ -953,18 +955,25 @@ def run_inference(
         log.info("Inference halo ON — replicate-padded %d cells (S/E/N/W edge artifact cropped)", halo)
     with torch.no_grad():
         for lead_h in LEAD_HOURS:
-            n_skip = lead_h // 6   # trailing steps to drop (most-recent removed)
+            n_skip = lead_h // 6   # number of OLDEST frames to drop
 
+            # Keep the NEWEST 9 - n_skip frames, ending at t0 (NOT t0 - tau).
+            # Training feeds the frames ending at the last real observation and
+            # predicts genesis tau hours AFTER that frame (tau implied by how many
+            # frames are real vs zero-padded). To forecast genesis at t0 + tau we
+            # keep the most recent 9 - n_skip frames (t0 - (48 - tau) ... t0).
             if n_skip == 0:
-                X_lead = X                              # (1, 9, 8, H, W)
+                X_lead = X                              # (1, 9, 8, H, W), ends at t0
             else:
-                X_lead = X[:, :-n_skip, :, :, :]       # drop the n_skip newest
+                X_lead = X[:, n_skip:, :, :, :]        # drop n_skip OLDEST; still ends at t0
 
-            # Pad front with oldest frame if shorter than T_required=9
+            # Front-pad with ZEROS to T=9, matching tcg_collate_fn at train time
+            # (NOT replicate: training padded with torch.zeros).
             T_req   = 9
             T_avail = X_lead.shape[1]
             if T_avail < T_req:
-                pad = X_lead[:, :1].expand(-1, T_req - T_avail, -1, -1, -1)
+                b, _, C, H, W = X_lead.shape
+                pad = X_lead.new_zeros(b, T_req - T_avail, C, H, W)
                 X_lead = torch.cat([pad, X_lead], dim=1)
 
             logits = _forward_halo(model, X_lead, halo)   # (H, W) raw logits (halo-cropped if halo>0)

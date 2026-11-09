@@ -683,7 +683,7 @@ class TCGMultiLeadLoss(nn.Module):
 
     Positive samples — softmax KL divergence over ocean cells:
         Normalises the gaussian target to a probability distribution over the
-        9,894 ocean cells, then minimises KL(target ∥ softmax(logits)).
+        9,894 ocean cells, then minimizes KL(target ∥ softmax(logits)).
         Softmax forces probability mass to concentrate: mass on wrong cells
         directly reduces mass on the genesis cell, preventing diffuse blobs.
 

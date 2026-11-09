@@ -7,8 +7,9 @@ does everything correctness-critical here:
 
   1. build the (1, 9, 8, H, W) window via proto.build_input_tensor
   2. REORDER channels from the prototype's order -> the training order
-  3. per lead L, keep the newest (9 - L/6) frames ending at t0
-     (matches training: fields = storms[:, :input_timestep+1])
+  3. per lead L, keep the newest (9 - L/6) frames ending at t0, then zero-pad
+     the front to T=9 (matches training: fields = storms[:, :input_timestep+1]
+     left-padded with zeros by tcg_collate_fn); genesis field valid at t0 + L
   4. TemporalTCG -> logits -> mask land -> spatial softmax -> probability map
   5. write via ews_core.write_ews_netcdf (one schema, 0..360)
 
@@ -111,8 +112,15 @@ def run(
     prob = np.zeros((len(LEAD_HOURS), H, W), dtype="float32")
     with torch.no_grad():
         for li, L in enumerate(LEAD_HOURS):
-            # 3: newest (9 - L/6) frames ending at t0
-            x_in = X[:, L // 6:].to(dev)                    # (1, 9-L/6, 8, H, W)
+            # 3: newest (9 - L/6) frames ending at t0, then ZERO-pad the front to
+            #    T=9 so the ConvLSTM sees the same leading-zero warm-up it saw in
+            #    training (tcg_collate_fn left-pads with torch.zeros).
+            x_keep = X[:, L // 6:]                           # (1, 9-L/6, 8, H, W)
+            n_pad  = len(LEAD_HOURS) - x_keep.shape[1]       # = L/6
+            if n_pad > 0:
+                b, _, C, Hc, Wc = x_keep.shape
+                x_keep = torch.cat([x_keep.new_zeros(b, n_pad, C, Hc, Wc), x_keep], dim=1)
+            x_in = x_keep.to(dev)                            # (1, 9, 8, H, W)
             logits = model(x_in).squeeze(1).squeeze(0)      # (H, W)
             # 4: mask land, spatial softmax over the whole grid
             logits = torch.where(ocean_t, logits, NEG)
