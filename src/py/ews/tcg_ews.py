@@ -85,7 +85,7 @@ log = logging.getLogger("TCG-EWS")
 # tcpyPI — optional; required only for PI channel
 # ─────────────────────────────────────────────────────────────────────────────
 _TCPYPI_PATHS = [
-    os.path.abspath(r"D:\GitHub\causal\tcpyPI\src"),   # Windows dev machine
+    os.path.abspath(r"C:\GitHub\causal\tcpyPI\src"),   # Windows dev machine
     os.path.abspath("./tcpyPI/src"),                    # relative fallback
 ]
 for _p in _TCPYPI_PATHS:

@@ -33,6 +33,7 @@ import os
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 PATH = '..\\..\\..\\data\\'
+_from_year: int = 1979
 
 # Define the grid parameters
 # _basin:    str = 'NA' # assumed, hardcoded for now
@@ -42,14 +43,21 @@ PATH = '..\\..\\..\\data\\'
 # _west: float = 263 # NAGM Starting longitude (degrees)
 # _east: float = 279 # NAGM Ending longitude (degrees)
 
-_from_year: int = 1979
-_basin: str = 'NA'                      # assumed, hardcoded for now
-_subbasin: str = 'CSGM'                 # combined NACS + NAGM label (used for file naming)
-_valid_subbasins: set = {'CS', 'GM'}    # IBTrACS SUBBASIN codes to accept
-_south: float = 11.0   # combined MBR south (degrees)
-_north: float = 32.0   # combined MBR north (degrees)
-_west: float  = 263.0  # combined MBR west  (degrees, 0–360)
-_east: float  = 305.0  # combined MBR east  (degrees, 0–360)
+# _basin: str = 'NA'                      # assumed, hardcoded for now
+# _subbasin: str = 'CSGM'                 # combined NACS + NAGM label (used for file naming)
+# _valid_subbasins: set = {'CS', 'GM'}    # IBTrACS SUBBASIN codes to accept
+# _south: float = 11.0   # combined MBR south (degrees)
+# _north: float = 32.0   # combined MBR north (degrees)
+# _west: float  = 263.0  # combined MBR west  (degrees, 0–360)
+# _east: float  = 305.0  # combined MBR east  (degrees, 0–360)
+
+_basin:    str = 'WP' # assumed, hardcoded for now
+_subbasin: str = 'MM' # assumed, hardcoded for now
+_valid_subbasins: set = {'MM'}
+_south: float =  5 # WPMM Starting latitude (degrees)
+_north: float = 45 # WPMM Ending latitude (degrees)
+_west: float = 105 # WPMM Starting longitude (degrees)
+_east: float = 180 # WPMM Ending longitude (degrees)
 
 # TRACK_TYPE policy -------------------------------------------------------
 # IBTrACS reanalyzes tracks to TRACK_TYPE='main' only AFTER the season; the
@@ -69,14 +77,6 @@ _PROVISIONAL_TRACK_TYPES: set = {'PROVISIONAL', 'US-PROVISIONAL'}  # IBTrACS cur
 #   north: 31→30  (clips US Gulf coast landfall/re-curve zone)
 #   west:  262→263 (stays inside Gulf of Campeche genesis region)
 #   east:  301→300 (trims eastern Caribbean edge noise)
-
-# _basin:    str = 'WP' # assumed, hardcoded for now
-# _subbasin: str = 'MM' # assumed, hardcoded for now
-# _valid_subbasins: set = {'MM'}
-# _south: float =  5 # WPMM Starting latitude (degrees)
-# _north: float = 45 # WPMM Ending latitude (degrees)
-# _west: float = 105 # WPMM Starting longitude (degrees)
-# _east: float = 180 # WPMM Ending longitude (degrees)
 
 # _basin:    str = 'MD' # assumed, hardcoded for now
 # _subbasin: str = 'MD' # assumed, hardcoded for now
