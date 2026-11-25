@@ -1239,7 +1239,7 @@ def run_loyo_experiment(
 
         # ── Year filter: skip years not in the configured subset ────────────
         if LOYO_YEARS_TO_RUN is not None and test_year not in LOYO_YEARS_TO_RUN:
-            continue
+            continue   # silent — keeps logs focused on years we care about
 
         # ── Resume check: skip already-completed folds ──────────────────────
         if test_year in results_by_year:

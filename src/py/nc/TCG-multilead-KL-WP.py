@@ -329,6 +329,19 @@ ALL_EXCLUDED_IDS = CLIPPED_BOUNDARY_IDS | EDGE_EXCLUSION_IDS
 # SIGMA SCHEDULE — spatial uncertainty by lead time
 # =============================================================================
 
+# =============================================================================
+# SIGMA SCHEDULE — spatial uncertainty by lead time
+# =============================================================================
+# Reverted to original NACSGM values after experiment showed wider sigma
+# (sigma_max=26) improved training-time val_loss but hurt test-time
+# generalization (val_km=1845 -> test_km=2304 on fold 1, a 25% gap vs 3% on
+# the original schedule). The wider sigma decoupled "loss minimum" from
+# "actual km accuracy minimum" because fuzzier target distributions are
+# easier to match without forcing accurate localization.
+#
+# Real WP training-quality issue is suspected to be neg_weight being too low
+# (was 0.02), so the model wasn't forced to distinguish positive from negative
+# inputs. See TCGMultiLeadLoss.__init__ for the neg_weight fix.
 SIGMA_BY_LEAD_HOURS = {
     0:  1.0,     # ~25 km  — tight localization
     6:  1.5,     # ~37 km
@@ -1338,17 +1351,11 @@ def run_loyo_experiment(
                       flush=True)
 
         # Quick sanity check: show where model predicts on first test batch at init
-        print(f"  [diag] Setting model.eval()...", flush=True)
         model.eval()
-        print(f"  [diag] Fetching first test batch...", flush=True)
         with torch.no_grad():
             for _bx, _bt, _bn, _bl, _bs, _sw in test_loader:
-                print(f"  [diag] Batch fetched: x={tuple(_bx.shape)}, "
-                      f"moving to {device}...", flush=True)
                 _bx = _bx.to(device)
-                print(f"  [diag] First batch on GPU. Running forward...", flush=True)
                 _logits = model(_bx).squeeze(1)  # (B, H, W)
-                print(f"  [diag] Forward done. logits={tuple(_logits.shape)}", flush=True)
                 _lm = torch.FloatTensor(land_mask.astype('float32')).to(device)
                 _logits = _logits + (1 - _lm.unsqueeze(0)) * (-1e9)
                 _pred_idxs = _logits.view(_bx.shape[0], -1).argmax(dim=1)
