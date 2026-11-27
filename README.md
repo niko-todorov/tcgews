@@ -3,7 +3,7 @@
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23204864.svg)](https://doi.org/10.5281/zenodo.23204864)
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/niko-todorov/tcgews/blob/main/colab_demo.ipynb)
 [![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://tcgews.streamlit.app/)
-[![Dissertation DOI](https://img.shields.io/badge/Dissertation-10.36837%2Fchapman.000774-blue?logo=doi&logoColor=white)](https://doi.org/10.36837/chapman.000774)
+[![Dissertation](https://img.shields.io/badge/Dissertation-10.36837%2Fchapman.000774-blue)](https://doi.org/10.36837/chapman.000774)
 
 Source code accompanying the dissertation **_Predictive Tropical Cyclogenesis Using Deep Learning: A Novel Approach to Early Warning Systems_** (Nikolay Todorov, Chapman University; dissertation DOI: [10.36837/chapman.000774](https://doi.org/10.36837/chapman.000774)).
 
@@ -162,8 +162,8 @@ Please cite both the dissertation and the archived software release.
 }
 ```
 
-Dissertation: <https://doi.org/10.36837/chapman.000774>
-Software archive: Zenodo DOI `10.5281/zenodo.23204864` (all versions).
+Dissertation: [https://doi.org/10.36837/chapman.000774](https://doi.org/10.36837/chapman.000774)
+Software archive: Zenodo DOI [`10.5281/zenodo.23204864`](https://doi.org/10.5281/zenodo.23204864) (all versions).
 
 ---
 
