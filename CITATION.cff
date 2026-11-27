@@ -24,4 +24,16 @@ keywords:
   - ConvLSTM
   - early warning system
   - ERA5
-doi: 10.5281/zenodo.23204865
+doi: 10.5281/zenodo.23204864
+preferred-citation:
+  type: thesis
+  title: "Predictive Tropical Cyclogenesis Using Deep Learning: A Novel Approach to Early Warning Systems"
+  authors:
+    - family-names: Todorov
+      given-names: Nikolay
+      affiliation: "Chapman University"
+      orcid: "https://orcid.org/0000-0002-9108-8081"
+  institution:
+    name: "Chapman University"
+  year: 2026
+  doi: 10.36837/chapman.000774

@@ -1,0 +1,16 @@
+copy D:\GitHub\causal\.cdsapirc C:\users\todorov\.cdsapirc
+
+# ntodorov@chapman.edu
+url: https://cds.climate.copernicus.eu/api
+key: 7a9e346f-1f96-4fc7-9a49-84dff5bcbee7
+
+User ID: 7a9e346f-1f96-4fc7-9a49-84dff5bcbee7
+Personal Access Token: f4e62d4c-7cfa-49ae-a9b6-601a82bdd922
+
+# todorov@chapman.edu
+
+url: https://cds.climate.copernicus.eu/api
+key: 0957dc64-65bc-4cd8-bc3e-0900bdd64e1d
+
+User ID: bc1bb7f0-2d3c-4d84-bf6c-b09a5d30d47b
+Personal Access Token: 122813c9-95da-4878-9b98-5e5412e7ea5f
