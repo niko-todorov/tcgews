@@ -1,12 +1,13 @@
 # Predictive Tropical Cyclogenesis  Using Deep Learning:  A Novel Approach to Early Warning Systems
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23204865.svg)](https://doi.org/10.5281/zenodo.23204865)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23204864.svg)](https://doi.org/10.5281/zenodo.23204864)
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/niko-todorov/tcgews/blob/main/colab_demo.ipynb)
 [![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://tcgews.streamlit.app/)
+[![Dissertation DOI](https://img.shields.io/badge/Dissertation-10.36837%2Fchapman.000774-blue?logo=doi&logoColor=white)](https://doi.org/10.36837/chapman.000774)
 
-Source code accompanying the dissertation **_Predictive Tropical Cyclogenesis Using Deep Learning: A Novel Approach to Early Warning Systems_** (Nikolay Todorov, Chapman University).
+Source code accompanying the dissertation **_Predictive Tropical Cyclogenesis Using Deep Learning: A Novel Approach to Early Warning Systems_** (Nikolay Todorov, Chapman University; dissertation DOI: [10.36837/chapman.000774](https://doi.org/10.36837/chapman.000774)).
 
-This repository is a **curated release**: it contains the source code required to reproduce the results reported in the dissertation. It is not the full working tree — one-off data-repair utilities and exploratory scripts are intentionally excluded.
+This repository is a **curated release**: it contains the source code required to reproduce the results reported in the dissertation. It is not the full working tree â€” one-off data-repair utilities and exploratory scripts are intentionally excluded.
 
 > If you use this code, please cite the dissertation and the archived release (see
 > [Citation](#citation)).
@@ -16,8 +17,8 @@ This repository is a **curated release**: it contains the source code required t
 ## Overview
 
 The system predicts a **calibrated genesis-location probability field** for tropical cyclogenesis
-(TCG) across nine 6-hourly lead times (0–48 h). The model, `TemporalTCG`, is a ConvLSTM encoder with
-temporal-attention pooling and a spatial-softmax head, trained with a Kullback–Leibler-divergence
+(TCG) across nine 6-hourly lead times (0â€“48 h). The model, `TemporalTCG`, is a ConvLSTM encoder with
+temporal-attention pooling and a spatial-softmax head, trained with a Kullbackâ€“Leibler-divergence
 objective on lead-time-varying Gaussian targets (positives) and a peakedness-suppression term
 (negatives), under **leave-one-year-out (LOYO) cross-validation**.
 
@@ -25,8 +26,8 @@ Two basins are supported with a single architecture trained independently per ba
 
 | Basin  | Domain                                   | Grid      |
 |--------|------------------------------------------|-----------|
-| NACSGM | North Atlantic / Caribbean / Gulf — 11–32°N, 263–305°E | 85 × 169 @ 0.25° |
-| WPMM   | Western Pacific — 5–45°N, 105–180°E      | 161 × 301 @ 0.25° |
+| NACSGM | North Atlantic / Caribbean / Gulf â€” 11â€“32Â°N, 263â€“305Â°E | 85 Ã— 169 @ 0.25Â° |
+| WPMM   | Western Pacific â€” 5â€“45Â°N, 105â€“180Â°E      | 161 Ã— 301 @ 0.25Â° |
 
 Eight input channels: `sst, msl, cape, r, vo, d, vwsh, pi` (potential intensity via
 [tcpyPI](https://github.com/dgilford/tcpyPI)). A trained model is delivered through an operational
@@ -65,13 +66,13 @@ Python = 3.10 is recommended. A CUDA-capable GPU is recommended for training; in
 
 No data are committed to this repository (licensing and size). You will need:
 
-- **ERA5 reanalysis** — via the [Copernicus Climate Data Store (CDS)](https://cds.climate.copernicus.eu/).
+- **ERA5 reanalysis** â€” via the [Copernicus Climate Data Store (CDS)](https://cds.climate.copernicus.eu/).
   Create a free account and place your API key in `~/.cdsapirc`. ERA5 is the source used for all
   reproducible (historical) cases.
-- **IBTrACS** — downloaded automatically by `track.py`.
-- **HURDAT2** — the Atlantic best-track archive (public domain), used for negative-sample construction.
-- **ECMWF open-data** — real-time forecasts only, via the `ecmwf-opendata` client. Note: the open-data
-  portal retains only the **most recent ~2–3 days** of forecasts, so historical cases must use ERA5.
+- **IBTrACS** â€” downloaded automatically by `track.py`.
+- **HURDAT2** â€” the Atlantic best-track archive (public domain), used for negative-sample construction.
+- **ECMWF open-data** â€” real-time forecasts only, via the `ecmwf-opendata` client. Note: the open-data
+  portal retains only the **most recent ~2â€“3 days** of forecasts, so historical cases must use ERA5.
 
 Model checkpoints are **not** in the git history; they are attached to the archived release
 (see [Model weights](#model-weights)).
@@ -105,7 +106,7 @@ python tcg_ews.py --basin NACSGM --source era5 --time 2009-09-02T18:00 \
     --truth 16.3,299.0 --taper --ocean-fill --halo 6 --argmax component
 ```
 
-### Reproduce the dissertation case studies (Figures 7.1–7.8)
+### Reproduce the dissertation case studies (Figures 7.1â€“7.8)
 
 All eight operational case studies are reproducible from ERA5 with:
 ```bash
@@ -113,7 +114,7 @@ python tcg_ews.py --basin <NACSGM|WPMM> --source era5 --time <time> \
     --truth <lat,lon> --taper --ocean-fill --halo 6 --argmax component
 ```
 
-| Fig | Storm (year) | Basin | `--time` | `--truth` (lat, lon °E)|
+| Fig | Storm (year) | Basin | `--time` | `--truth` (lat, lon Â°E)|
 |-----|--------------|-------|----------|------------------------|
 | 7.1 | Klaus (1984)   | NACSGM | 1984-11-05T18:00 | 14.7, 291.2 |
 | 7.2 | Fabian (1991)  | NACSGM | 1991-10-15T00:00 | 18.9, 274.3 |
@@ -124,19 +125,22 @@ python tcg_ews.py --basin <NACSGM|WPMM> --source era5 --time <time> \
 | 7.7 | Dujuan (2009)  | WPMM   | 2009-09-02T18:00 | 17.6, 130.1 |
 | 7.8 | Kujira (2015)  | WPMM   | 2015-06-19T18:00 | 15.0, 112.2 |
 
-> NACSGM longitudes are given in °E (0–360) to match the model grid. If `tcg_ews.py` expects signed
-> longitudes, use the °W equivalents (-68.8, -85.7, -61.0, -96.0).
+> NACSGM longitudes are given in Â°E (0â€“360) to match the model grid. If `tcg_ews.py` expects signed
+> longitudes, use the Â°W equivalents (-68.8, -85.7, -61.0, -96.0).
 
 ---
 
 ## Model weights
 
-Trained LOYO checkpoints are archived with the release at **Zenodo: `10.5281/zenodo.23204865`**. Download and
-place them where `tcg_ews.py` expects them (see the script's `--help`).
+Trained LOYO checkpoints are archived with the release at **Zenodo: `10.5281/zenodo.23204864`** (concept
+DOI â€” always resolves to the latest version). Download and place them where `tcg_ews.py` expects them
+(see the script's `--help`).
 
 ---
 
 ## Citation
+
+Please cite both the dissertation and the archived software release.
 
 ```bibtex
 @phdthesis{Todorov_TCG,
@@ -144,16 +148,28 @@ place them where `tcg_ews.py` expects them (see the script's `--help`).
   title  = {Predictive Tropical Cyclogenesis Using Deep Learning:
             A Novel Approach to Early Warning Systems},
   school = {Chapman University},
-  year   = {2026}
+  year   = {2026},
+  doi    = {10.36837/chapman.000774}
+}
+
+@software{Todorov_TCG_software,
+  author  = {Todorov, Nikolay},
+  title   = {Predictive Tropical Cyclogenesis Using Deep Learning:
+             A Novel Approach to Early Warning Systems (software)},
+  year    = {2026},
+  publisher = {Zenodo},
+  doi     = {10.5281/zenodo.23204864}
 }
 ```
-Software archive: **Zenodo DOI `10.5281/zenodo.23204865`**.
+
+Dissertation: <https://doi.org/10.36837/chapman.000774>
+Software archive: Zenodo DOI `10.5281/zenodo.23204864` (all versions).
 
 ---
 
 ## License
 
-Released under the MIT License — see [`LICENSE`](LICENSE).
+Released under the MIT License â€” see [`LICENSE`](LICENSE).
 
 ---
 
