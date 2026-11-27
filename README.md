@@ -168,7 +168,7 @@ Please cite both the dissertation and the archived software release.
 }
 ```
 
-Dissertation: Chapman DOI [`10.36837/chapman.000774`](https://doi.org/10.36837/chapman.000774)
+Dissertation: Chapman DOI [`10.36837/chapman.000774`](https://doi.org/10.36837/chapman.000774)<br>
 Software archive: Zenodo DOI [`10.5281/zenodo.23204864`](https://doi.org/10.5281/zenodo.23204864) (all versions).
 
 ---
