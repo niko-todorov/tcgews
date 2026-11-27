@@ -142,6 +142,8 @@ DOI — always resolves to the latest version). Download and place them where `t
 
 Please cite both the dissertation and the archived software release.
 
+**Dissertation**
+
 ```bibtex
 @phdthesis{Todorov_TCG,
   author = {Todorov, Nikolay},
@@ -151,18 +153,22 @@ Please cite both the dissertation and the archived software release.
   year   = {2026},
   doi    = {10.36837/chapman.000774}
 }
+```
 
+**Software**
+
+```bibtex
 @software{Todorov_TCG_software,
-  author  = {Todorov, Nikolay},
-  title   = {Predictive Tropical Cyclogenesis Using Deep Learning:
-             A Novel Approach to Early Warning Systems (software)},
-  year    = {2026},
+  author    = {Todorov, Nikolay},
+  title     = {Predictive Tropical Cyclogenesis Using Deep Learning:
+               A Novel Approach to Early Warning Systems (software)},
+  year      = {2026},
   publisher = {Zenodo},
-  doi     = {10.5281/zenodo.23204864}
+  doi       = {10.5281/zenodo.23204864}
 }
 ```
 
-Dissertation: [https://doi.org/10.36837/chapman.000774](https://doi.org/10.36837/chapman.000774)
+Dissertation: Chapman DOI [`10.36837/chapman.000774`](https://doi.org/10.36837/chapman.000774)
 Software archive: Zenodo DOI [`10.5281/zenodo.23204864`](https://doi.org/10.5281/zenodo.23204864) (all versions).
 
 ---
